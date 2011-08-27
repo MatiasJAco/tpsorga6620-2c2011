@@ -33,7 +33,7 @@ int main() {
 				encontrada =true;
 				getline(arch2,cadena2);
 			} else {
-			//Proxima linea
+			//Saltear  linea
 				getline(arch2,linea);
 			}
 		}
