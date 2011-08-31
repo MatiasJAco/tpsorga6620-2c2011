@@ -1,0 +1,222 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[spanish]{babel}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage[latin1]{inputenc}
+
+
+% Titulo del Trabajo Practico.
+\title{ Trabajo Pr\'actico 0: infraestructura b\'asica   \\
+        \Large{ 66.20 Organizaci\'on de las Computadoras } }
+
+
+% Informaci\'on sobre los autores.
+\author{Nicol\'as Calvo, \textit{Padr\'on Nro. 78.914}           	\\
+            \texttt{ nicolas.g.calvo@gmail.com }      			\\
+            Celeste Maldonado, \textit{Padr\'on Nro. xx.xxx}              	\\
+            \texttt{ maldonado.celeste@gmail.com }                             \\
+            Matias Acosta, \textit{Padr\'on Nro. 88.590}                \\
+            \texttt{ matiasja@gmail.com }                     		\\
+            \LARGE{}         						\\
+            \LARGE{}         						\\
+            \LARGE{}         						\\
+            \Large{Grupo Nro.  - 2do. Cuatrimestre de 2011}         	\\
+            \texttt{}         						\\
+            \Large{66.20 Organizaci\'on de Computadoras}            	\\
+            \texttt{}         						\\
+            \Large{Facultad de Ingenier\'\i{}a, Universidad de Buenos Aires}            \\
+       }
+\date{}
+
+
+
+\begin{document}
+
+\begin{figure}
+\centering
+\includegraphics[width=100pt]{logofiuba.jpg}
+\end{figure}
+
+
+\maketitle
+\thispagestyle{empty}   % quita el numero en la primer pagina
+%\renewcommand{\labelenumi}{\alph{enumi}.}
+
+\newpage
+
+\section{Objetivos}
+
+Familiarizarse con las herramientas de software que usaremos en los siguientes trabajos.
+
+\section{Introducci\'on}
+
+Para la realizaci\'on del trabajo pr\'actico fue necesario simular un sistema operativo (NetBSD) que utiliza un procesador MIPS. En el simulador utilizamos el programa GXemul, que permite simular el entorno necesario para producir el c\'odigo, compilarlo, ejecutarlo y obtener el c\'odigo MIPS32 generado por el compilador.
+
+\section{Programa}
+
+El programa, a escribir en lenguaje C, es una versi\'on minimalista del comando join de UNIX. El mismo, realizar\'a la uni\'on de dos archivos seg\'un la primer palabra/campo de cada archivo que ser\'a tomado como clave de uni\'on. Si se pasa s\'olo uno de los archivos a unir, se leer\'a de la entrada estandar.
+
+\newpage
+
+
+\section{Uso y comandos}
+
+La entrada del programa ser\'an los dos archivos a unir. En caso de no especificarse uno, el programa leer\'a de la entrada estadard stdin. \\
+El programa debe tener como salida, la misma informaci\'on que el comando join de UNIX. Se debe respetar la presentaci\'on de esta tal cual la realiza el comando. Adem\'as el programa debe soportar el orden, cantidad y disposici\'on de los par\'ametros tal cual lo soporta el comando original de UNIX.  \\
+Los mensajes de error deben indicarse via stderr. \\
+A continuaci\'on se describen las opciones disponibles:
+
+\begin{itemize}
+\item	``-V'' o ``--version'': esta opci\'on muestra la versi\'on del programa. No recibe ning\'un argumento.
+
+\item	``-h'' o ``--help'': esta opci\'on muestra un mensaje de ayuda, el cual posee las opciones que recibe el programa.
+
+\item	``-i'' o ``--ignore-case'': ignora la diferencia en la comparaci\'on de las claves de los archivos.
+
+\newpage
+\section{Ejemplo}
+
+
+A continuaci\'on se exponen varios ejemplos del uso de la aplicaci\'on. \\
+
+Usamos la opci\'on -h para ver el mensaje de ayuda:
+\begin{verbatim}
+tp0 -h
+Usage: join [OPTION]... FILE1 FILE2
+For each pair of input lines with identical join fields, write a line to standard output. The default join field is the first, delimited
+by whitespace. When FILE1 or FILE2 (not both) is -, read standard input. \\
+-i, --ignore-case ignore differences in case when comparing fields
+-h, --help display this help and exit
+-v, --version output version information and exit
+Important: FILE1 and FILE2 must be sorted on the join fields. \\
+E.g., use `sort -k 1b,1' if `join' has no options. \\
+Note, comparisons honor the rules specified by ``LC_COLLATE". \\
+If the input is not sorted and some lines cannot be joined, a warning message will be given.
+
+\end{verbatim}
+
+Ejemplo de una ejecuci\'on:
+\begin{verbatim}
+$ cat ApellidoNombre
+1 Djokovic, Novak
+2 Nadal, Rafael
+3 Federer, Roger
+4 Murray, Andy
+5 Ferrer, David
+6 Soderling, Robin
+7 Monfils, Gael
+8 Fish, Mardy
+9 Berdych, Tomas
+10 Almagro, Nicolas
+
+$ cat Puntaje
+1 13,920
+2 11,420
+3 8,380
+4 6,535
+5 4,200
+6 4,145
+7 3,165
+8 2,820
+9 2,690
+10 2,380
+
+$ tp0 ApellidoNombre Puntaje
+1 Djokovic, Novak 13,920
+2 Nadal, Rafael 11,420
+3 Federer, Roger 8,380
+4 Murray, Andy 6,535
+5 Ferrer, David 4,200
+6 Soderling, Robin 4,145
+7 Monfils, Gael 3,165
+8 Fish, Mardy 2,820
+9 Berdych, Tomas 2,690
+10 Almagro, Nicolas 2,380
+
+$
+
+\end{verbatim}
+
+\end{itemize}
+
+\newpage
+
+\section{Proceso y salida}
+
+Primero se verifican los par\'ametros utilizados para llamar el programa. En caso de encontrarse un error en alguno de los argumentos de entrada se reporta mediante un mensaje de error.
+
+El formato del archivo de entrada es de texto. 
+
+\section{Manejo de errores}
+
+El manejo de errores se realiza mediante el stream stderr, en caso de error se muestra una leyenda que se corresponde con cada caso.
+
+
+\newpage
+\section{Pruebas}
+
+\subsection{Compilaci\'on}
+Luego de generar el codigo compilamos en el sistema operativo simulado con la siguiente linea:\\
+
+	gcc -Wall -lm -O0 -o tp0 tp0.c
+
+\begin{itemize}
+\item	Wall: activa todos los mensajes de warning.
+
+\item	O: indica el nivel de optimizacion, en este caso no queremos que el compilador optimice el programa por lo que ponemos nivel 0.
+
+\item	o: genera el archivo de salida.
+
+\end{itemize}
+
+Habiendo generado el ejecutable procedemos a realizar corridas de prueba. \\
+
+\newpage
+
+\subsection {An\'alisis de los resultados}
+
+Se prosigue a detallar algunas corridas del programa en el sistema NetBSD para mostrar su funcionalidad.  \\
+A trav\'es del comando: 
+
+\begin{verbatim}
+	.\tp0 -h
+\end{verbatim}
+
+Se imprime por pantalla el mensaje de ayudar con detalles del uso, opciones y ejemplos de uso de la aplicaci\'on: 
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=400pt]{prueba1.jpg}
+\caption{Mensaje de ayuda}
+\end{figure}
+
+\newpage
+
+
+\section{C\'odigo}
+\subsection{C}
+
+\begin{verbatim}
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <math.h>
+#include <getopt.h>
+
+
+\end{verbatim}
+
+
+\newpage
+\subsection{MIPS}
+
+\begin{verbatim}
+	.file	1 "tp0.c"
+	.section .mdebug.abi32
+
+\end{verbatim}
+
+\end{document}
+
