@@ -1,13 +1,15 @@
 #include <stdio.h>
 #include <getopt.h>
+#include "string.h"
 
 typedef enum {TRUE, FALSE} bool;
 
 //Headers.
 void print_help(void);
+void funcionJoin(char* filepath1, char* filepath2);
+void limpiar (char *cadena);
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 	//Variables especiales para la función 'getopt_long'.
 	static struct option long_options[] =
 	{
@@ -20,7 +22,7 @@ int main(int argc, char **argv)
 
 	//Variables de estado de los argumentos del programa.
 	bool h_flag, v_flag,i_flag;
-
+//	bool ejecutar = FALSE;
 	int c;
 
 	//Utilizo la función 'getopt_long' para analizar los argumentos.
@@ -54,7 +56,20 @@ int main(int argc, char **argv)
 	if (i_flag == TRUE) {
 		return 0;
 	}
-
+	char* filepath1;
+	char* filepath2;
+	char filepathConsole [100];
+	if (argc > 1){
+		filepath1=argv[1];
+		if(argc >2){
+			filepath2 = argv[2];
+		} else{
+			fgets(filepathConsole, 100, stdin);
+			limpiar(filepathConsole);
+			filepath2=&filepathConsole[0];
+		}
+		funcionJoin(filepath1, filepath2);
+	}
 	return 0;
 }
 
@@ -76,3 +91,68 @@ void print_help(void) {
 
 	return;
 }
+
+void limpiar (char *cadena) {
+  char *p;
+  p = strchr (cadena, '\n');
+  if (p)
+    *p = '\0';
+}
+void funcionJoin(char* filepath1, char* filepath2){
+
+	FILE* arch1 = fopen(filepath1, "r");
+	FILE* arch2 = fopen(filepath2, "r");
+	char clave1;
+	char clave2;
+	char linea [100];
+	char cadena1 [100];
+	char cadena2 [100];
+
+	bool encontrada = FALSE;
+	bool fin = FALSE;
+	bool archivosAbiertos = TRUE;
+
+	if (arch1==NULL) {
+	   fprintf(stderr,"Error al abrir %s \n", filepath1);
+	   archivosAbiertos= FALSE;
+	}
+	if (arch2==NULL) {
+	   fprintf(stderr,"Error al abrir %s \n", filepath2);
+	   archivosAbiertos= FALSE;
+	}
+
+	if (archivosAbiertos == TRUE){
+		clave1 = fgetc(arch1);
+		while (feof(arch1)==0  && (fin == FALSE) ){
+			fgets(cadena1, 100, arch1);
+			limpiar(cadena1);
+			//Buscar clave en el segundo archivo.
+			while (encontrada == FALSE && feof(arch2)==0 ){
+				clave2 = fgetc(arch2);
+				if(clave1==clave2){
+					encontrada = TRUE;
+					fgets(cadena2, 100, arch2);
+					limpiar(cadena2);
+				} else {
+					//Saltear  linea
+					fgets(linea, 100, arch2);
+				}
+			}
+			//Mostrar cadenas unidas.
+			if (encontrada == TRUE){
+				printf("%c %s %s \n",clave1, cadena1, cadena2);
+				encontrada = FALSE;
+				clave1 = fgetc(arch1);
+				rewind(arch2);
+			} else {
+				fin =TRUE;
+			}
+		}
+		if (fin == TRUE) {
+			fprintf(stderr,"No se encontro la clave en el segundo archivo \n");
+		}
+		fclose(arch1);
+		fclose(arch2);
+	}
+}
+
