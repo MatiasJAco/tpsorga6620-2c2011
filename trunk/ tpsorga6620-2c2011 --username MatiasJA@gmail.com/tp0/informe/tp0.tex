@@ -2,9 +2,40 @@
 
 \usepackage[spanish]{babel}
 \usepackage{multirow}
-\usepackage{graphicx}
-\usepackage{fancyhdr}
+\usepackage{verbatim}
+\usepackage{moreverb}
+
+%Idioma
 \usepackage[latin1]{inputenc}
+%Letra arial
+\usepackage{helvet}
+%\renewcommand\familydefault{\sfdefault}
+%Para incluir codigo fuente
+\usepackage{listings}
+%Para tener encabezados y pie de pagina personalizados
+\usepackage{fancyhdr}
+%Para poner epï¿½rafe en las imagenes
+\usepackage[hang,bf]{caption2}
+
+%------------Gráficos------------
+%Paquete de gráficos
+\newif\ifpdf
+\ifx\pdfoutput\undefined
+	\pdffalse
+\else
+	\pdfoutput=1
+	\pdftrue
+\fi
+
+\ifpdf
+	\usepackage[pdftex]{graphicx}
+	\pdfcompresslevel=9
+% 	\pdfcompresslevel=0
+	\usepackage{pdfpages}
+\else
+	\usepackage[dvips]{graphicx}
+\fi
+
 
 
 % Titulo del Trabajo Practico.
@@ -15,16 +46,14 @@
 % Informaci\'on sobre los autores.
 \author{Nicol\'as Calvo, \textit{Padr\'on Nro. 78.914}           	\\
             \texttt{ nicolas.g.calvo@gmail.com }      			\\
-            Celeste Maldonado, \textit{Padr\'on Nro. xx.xxx}              	\\
+            Celeste Maldonado, \textit{Padr\'on Nro. 85.630}              	\\
             \texttt{ maldonado.celeste@gmail.com }                             \\
             Matias Acosta, \textit{Padr\'on Nro. 88.590}                \\
             \texttt{ matiasja@gmail.com }                     		\\
             \LARGE{}         						\\
             \LARGE{}         						\\
             \LARGE{}         						\\
-            \Large{Grupo Nro.  - 2do. Cuatrimestre de 2011}         	\\
-            \texttt{}         						\\
-            \Large{66.20 Organizaci\'on de Computadoras}            	\\
+            \Large{2do. Cuatrimestre de 2011}         	\\                       
             \texttt{}         						\\
             \Large{Facultad de Ingenier\'\i{}a, Universidad de Buenos Aires}            \\
        }
@@ -44,27 +73,75 @@
 \thispagestyle{empty}   % quita el numero en la primer pagina
 %\renewcommand{\labelenumi}{\alph{enumi}.}
 
+
+\newpage
+% Declaro el indice
+
+\tableofcontents
 \newpage
 
-\section{Objetivos}
+\setcounter{page}{1}
 
-Familiarizarse con las herramientas de software que usaremos en los siguientes trabajos.
+\includepdf[pages={1,2,3},addtotoc={2, section ,1 , Enunciado , Enunciado}]{enunciado.pdf}
+
 
 \section{Introducci\'on}
 
-Para la realizaci\'on del trabajo pr\'actico fue necesario simular un sistema operativo (NetBSD) que utiliza un procesador MIPS. En el simulador utilizamos el programa GXemul, que permite simular el entorno necesario para producir el c\'odigo, compilarlo, ejecutarlo y obtener el c\'odigo MIPS32 generado por el compilador.
-
-\section{Programa}
-
-El programa, a escribir en lenguaje C, es una versi\'on minimalista del comando join de UNIX. El mismo, realizar\'a la uni\'on de dos archivos seg\'un la primer palabra/campo de cada archivo que ser\'a tomado como clave de uni\'on. Si se pasa s\'olo uno de los archivos a unir, se leer\'a de la entrada estandar.
+Para la realizaci\'on del trabajo pr\'actico fue necesario simular un sistema operativo (NetBSD) que utiliza un procesador MIPS. 
+En el simulador utilizamos el programa GXemul, que permite simular el entorno necesario para producir el c\'odigo, compilarlo, 
+ejecutarlo y obtener el c\'odigo MIPS32 generado por el compilador.
 
 \newpage
 
+\section{Programa}
 
-\section{Uso y comandos}
+El programa, a escribir en lenguaje C, es una versi\'on minimalista del comando join de UNIX. 
+El mismo, realizar\'a la uni\'on de dos archivos seg\'un la primer palabra/campo de cada archivo que ser\'a tomado como 
+clave de uni\'on. Si se pasa s\'olo uno de los archivos a unir, se leer\'a de la entrada estandar.
 
-La entrada del programa ser\'an los dos archivos a unir. En caso de no especificarse uno, el programa leer\'a de la entrada estadard stdin. \\
-El programa debe tener como salida, la misma informaci\'on que el comando join de UNIX. Se debe respetar la presentaci\'on de esta tal cual la realiza el comando. Adem\'as el programa debe soportar el orden, cantidad y disposici\'on de los par\'ametros tal cual lo soporta el comando original de UNIX.  \\
+\subsection{Diseño e implementación}
+% falta aca explicar
+
+\paragraph{Proceso y salida}
+
+Primero se verifican los par\'ametros utilizados para llamar el programa. 
+En caso de encontrarse un error en alguno de los argumentos de entrada se reporta mediante un mensaje de error.
+El formato del archivo de entrada es de texto. 
+
+\paragraph{Manejo de errores}
+
+El manejo de errores se realiza mediante el stream stderr, en caso de error se muestra una leyenda que se corresponde con cada caso.
+
+
+\subsection{Generación}
+Para generar el binario hay que ejecutar el siguiente comando:
+\begin{tabbing}
+\hspace{3cm}\= 	gcc -Wall -lm -O0 -o tp0 tp0.c\\
+\end{tabbing}
+
+Para compilar el código a MIPS se utiliza:
+
+\begin{tabbing}
+\hspace{3cm}\= gcc -Wall -O0 -S -mrnames tp0.c\\
+\end{tabbing}
+
+\begin{itemize}
+\item	Wall: activa todos los mensajes de warning.
+
+\item	O: indica el nivel de optimizacion, en este caso no queremos que el compilador optimice el programa por lo que ponemos nivel 0.
+
+\item	o: genera el archivo de salida.
+
+\end{itemize}
+
+\subsection{Uso y comandos}
+
+La entrada del programa ser\'an los dos archivos a unir. En caso de no especificarse uno, el programa leer\'a 
+de la entrada estandard stdin. \\
+El programa debe tener como salida, la misma informaci\'on que el comando join de UNIX. 
+Se debe respetar la presentaci\'on de esta tal cual la realiza el comando. 
+Adem\'as el programa debe soportar el orden, cantidad y disposici\'on de los par\'ametros tal cual lo soporta 
+el comando original de UNIX.  \\
 Los mensajes de error deben indicarse via stderr. \\
 A continuaci\'on se describen las opciones disponibles:
 
@@ -74,9 +151,10 @@ A continuaci\'on se describen las opciones disponibles:
 \item	``-h'' o ``--help'': esta opci\'on muestra un mensaje de ayuda, el cual posee las opciones que recibe el programa.
 
 \item	``-i'' o ``--ignore-case'': ignora la diferencia en la comparaci\'on de las claves de los archivos.
+\end{itemize}
 
-\newpage
-\section{Ejemplo}
+
+\subsubsection{Ejemplo}
 
 
 A continuaci\'on se exponen varios ejemplos del uso de la aplicaci\'on. \\
@@ -139,41 +217,20 @@ $
 
 \end{verbatim}
 
-\end{itemize}
-
 \newpage
 
-\section{Proceso y salida}
 
-Primero se verifican los par\'ametros utilizados para llamar el programa. En caso de encontrarse un error en alguno de los argumentos de entrada se reporta mediante un mensaje de error.
+\section{Pruebas (Test)}
+Se realizaron diferentes pruebas para poder abarcar todos los casos posibles que nos permitan determinar el buen 
+funcionamiento del programa.\newline
 
-El formato del archivo de entrada es de texto. 
-
-\section{Manejo de errores}
-
-El manejo de errores se realiza mediante el stream stderr, en caso de error se muestra una leyenda que se corresponde con cada caso.
-
-
-\newpage
-\section{Pruebas}
-
-\subsection{Compilaci\'on}
-Luego de generar el codigo compilamos en el sistema operativo simulado con la siguiente linea:\\
-
-	gcc -Wall -lm -O0 -o tp0 tp0.c
-
+\paragraph[Test1]{Prueba nº1}
+\label{Test1}
+ 
 \begin{itemize}
-\item	Wall: activa todos los mensajes de warning.
-
-\item	O: indica el nivel de optimizacion, en este caso no queremos que el compilador optimice el programa por lo que ponemos nivel 0.
-
-\item	o: genera el archivo de salida.
-
-\end{itemize}
-
-Habiendo generado el ejecutable procedemos a realizar corridas de prueba. \\
-
-\newpage
+  \item Comando \begin{verbatim}\end{verbatim}
+  \item Salida tp0 \begin{verbatim}\end{verbatim}
+\end{itemize} 
 
 \subsection {An\'alisis de los resultados}
 
@@ -186,37 +243,31 @@ A trav\'es del comando:
 
 Se imprime por pantalla el mensaje de ayudar con detalles del uso, opciones y ejemplos de uso de la aplicaci\'on: 
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=400pt]{prueba1.jpg}
-\caption{Mensaje de ayuda}
-\end{figure}
+% \begin{figure}[h]
+% \centering
+% \includegraphics[width=400pt]{prueba1.jpg}
+% \caption{Mensaje de ayuda}
+% \end{figure}
 
 \newpage
 
+\section{Código Fuente}
+\lstset{language=c,basicstyle=\small,showstringspaces=false,columns=fullflexible,frame=lines,tabsize=4,inputencoding=latin1,extendedchars=true}
 
-\section{C\'odigo}
-\subsection{C}
+\subsection{tp0.c}
+% \lstinputlisting{../src/tp0.c}
 
-\begin{verbatim}
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <math.h>
-#include <getopt.h>
-
-
-\end{verbatim}
+\subsection{tp0.s}
+\lstinputlisting{../assembly/tp0.s}
 
 
 \newpage
-\subsection{MIPS}
 
-\begin{verbatim}
-	.file	1 "tp0.c"
-	.section .mdebug.abi32
-
-\end{verbatim}
+\section{Conclusión}
+A través del trabajo práctico logramos familizarnos con herramientas del
+entorno $Gnu/Linux$. Entre estas herramientas se pueden descatar:  $ssh$ (Secure Shell), $scp$ (Secure Copy),
+algunos comandos básicos de linux, la utilización de $pipeline$ para el flujo
+de datos y el entorno $netBSD$. 
 
 \end{document}
 
