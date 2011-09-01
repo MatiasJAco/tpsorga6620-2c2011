@@ -1,15 +1,18 @@
-#include <stdio.h>
-#include <getopt.h>
+#include "stdio.h"
+#include "getopt.h"
 #include "string.h"
+#include "ctype.h"
 
 typedef enum {TRUE, FALSE} bool;
 
 //Headers.
 void print_help(void);
-void funcionJoin(char* filepath1, char* filepath2);
+void funcionJoin(char* filepath1, char* filepath2, bool i);
 void limpiar (char *cadena);
+bool comparaClaves(char c1, char c2, bool i);
 
 int main(int argc, char **argv) {
+	int i = 0;
 	//Variables especiales para la función 'getopt_long'.
 	static struct option long_options[] =
 	{
@@ -22,7 +25,7 @@ int main(int argc, char **argv) {
 
 	//Variables de estado de los argumentos del programa.
 	bool h_flag, v_flag,i_flag;
-//	bool ejecutar = FALSE;
+	bool ignore = FALSE;
 	int c;
 
 	//Utilizo la función 'getopt_long' para analizar los argumentos.
@@ -54,21 +57,24 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 	if (i_flag == TRUE) {
-		return 0;
+		ignore = TRUE;
+		i = 1;
 	}
 	char* filepath1;
 	char* filepath2;
 	char filepathConsole [100];
-	if (argc > 1){
-		filepath1=argv[1];
-		if(argc >2){
-			filepath2 = argv[2];
+	int primerPath = i + 1;
+	int segundoPath = i + 2;
+	if (argc > primerPath){
+		filepath1=argv[primerPath];
+		if(argc > segundoPath){
+			filepath2 = argv[segundoPath];
 		} else{
 			fgets(filepathConsole, 100, stdin);
 			limpiar(filepathConsole);
 			filepath2=&filepathConsole[0];
 		}
-		funcionJoin(filepath1, filepath2);
+		funcionJoin(filepath1, filepath2, ignore);
 	}
 	return 0;
 }
@@ -98,7 +104,7 @@ void limpiar (char *cadena) {
   if (p)
     *p = '\0';
 }
-void funcionJoin(char* filepath1, char* filepath2){
+void funcionJoin(char* filepath1, char* filepath2, bool ignore){
 
 	FILE* arch1 = fopen(filepath1, "r");
 	FILE* arch2 = fopen(filepath2, "r");
@@ -129,7 +135,7 @@ void funcionJoin(char* filepath1, char* filepath2){
 			//Buscar clave en el segundo archivo.
 			while (encontrada == FALSE && feof(arch2)==0 ){
 				clave2 = fgetc(arch2);
-				if(clave1==clave2){
+				if(comparaClaves(clave1,clave2, ignore) == TRUE){
 					encontrada = TRUE;
 					fgets(cadena2, 100, arch2);
 					limpiar(cadena2);
@@ -156,3 +162,15 @@ void funcionJoin(char* filepath1, char* filepath2){
 	}
 }
 
+bool comparaClaves(char c1, char c2, bool i){
+	bool result = FALSE;
+	if (c1 == c2)
+		result = TRUE;
+	if(i == TRUE){
+		if(toupper(c1) == toupper(c2))
+			result = TRUE;
+	}
+	return result;
+
+
+}
