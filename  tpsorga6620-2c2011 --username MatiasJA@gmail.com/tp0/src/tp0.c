@@ -9,7 +9,7 @@ typedef enum {TRUE, FALSE} bool;
 void print_help(void);
 void funcionJoin(char* filepath1, char* filepath2, bool i);
 void limpiar (char *cadena);
-bool comparaClaves(char c1, char c2, bool i);
+bool comparaClaves(char* c1, char* c2, bool i);
 
 int main(int argc, char **argv) {
 	int i = 0;
@@ -108,12 +108,13 @@ void funcionJoin(char* filepath1, char* filepath2, bool ignore){
 
 	FILE* arch1 = fopen(filepath1, "r");
 	FILE* arch2 = fopen(filepath2, "r");
-	char clave1;
-	char clave2;
-	char linea [100];
+	char clave1 [20];
+	char clave2[20];
+//	char linea [100];
 	char cadena1 [100];
 	char cadena2 [100];
-
+	char cadenaLeida1 [100];
+	char cadenaLeida2 [100];
 	bool encontrada = FALSE;
 	bool fin = FALSE;
 	bool archivosAbiertos = TRUE;
@@ -126,29 +127,36 @@ void funcionJoin(char* filepath1, char* filepath2, bool ignore){
 	   fprintf(stderr,"Error al abrir %s \n", filepath2);
 	   archivosAbiertos= FALSE;
 	}
-
+	char* cpToken;
 	if (archivosAbiertos == TRUE){
-		clave1 = fgetc(arch1);
+		fgets(cadenaLeida1, 100, arch1);
+		cpToken = strtok (cadenaLeida1, " ");
+		strcpy (clave1, cpToken);
 		while (feof(arch1)==0  && (fin == FALSE) ){
-			fgets(cadena1, 100, arch1);
+			cpToken = strtok (NULL, "\0");
+			strcpy (cadena1, cpToken);
 			limpiar(cadena1);
 			//Buscar clave en el segundo archivo.
 			while (encontrada == FALSE && feof(arch2)==0 ){
-				clave2 = fgetc(arch2);
+				fgets(cadenaLeida2, 100, arch2);
+				cpToken = strtok (cadenaLeida2, " ");
+				strcpy (clave2, cpToken);
 				if(comparaClaves(clave1,clave2, ignore) == TRUE){
 					encontrada = TRUE;
-					fgets(cadena2, 100, arch2);
+					cpToken = strtok (NULL, "\0");
+					strcpy (cadena2, cpToken);
 					limpiar(cadena2);
 				} else {
 					//Saltear  linea
-					fgets(linea, 100, arch2);
 				}
 			}
 			//Mostrar cadenas unidas.
 			if (encontrada == TRUE){
-				printf("%c %s %s \n",clave1, cadena1, cadena2);
+				printf("%s %s %s \n",clave1, cadena1, cadena2);
 				encontrada = FALSE;
-				clave1 = fgetc(arch1);
+				fgets(cadenaLeida1, 100, arch1);
+				cpToken = strtok (cadenaLeida1, " ");
+				strcpy (clave1, cpToken);
 				rewind(arch2);
 			} else {
 				fin =TRUE;
@@ -162,13 +170,13 @@ void funcionJoin(char* filepath1, char* filepath2, bool ignore){
 	}
 }
 
-bool comparaClaves(char c1, char c2, bool i){
+bool comparaClaves(char* c1, char* c2, bool i){
 	bool result = FALSE;
-	if (c1 == c2)
+	if(strcmp(c1,c2) == 0)
 		result = TRUE;
 	if(i == TRUE){
-		if(toupper(c1) == toupper(c2))
-			result = TRUE;
+		if(strcasecmp(c1,c2) == 0)
+				result = TRUE;
 	}
 	return result;
 
