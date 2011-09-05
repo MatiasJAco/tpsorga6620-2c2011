@@ -104,20 +104,45 @@ void limpiar (char *cadena) {
   if (p)
     *p = '\0';
 }
+
+bool buscarRepetida(char* clave, FILE* archivo, bool ignore){
+	bool result = FALSE;
+	char cadenaLeida [100];
+	char claveLeida [20];
+	char* cpToken;
+	int encontrados = 0;
+	fgets(cadenaLeida, 100, archivo);
+	while((encontrados < 2)&&(feof(archivo)==0)) {
+		 cpToken = strtok (cadenaLeida, " ");
+		 strcpy (claveLeida, cpToken);
+		 if(comparaClaves(claveLeida,clave, ignore) == TRUE){
+		 				encontrados++;
+		 }
+		 fgets(cadenaLeida, 100, archivo);
+	 }
+	if (encontrados > 1)
+		result = TRUE;
+	return result;
+}
 void funcionJoin(char* filepath1, char* filepath2, bool ignore){
 
 	FILE* arch1 = fopen(filepath1, "r");
 	FILE* arch2 = fopen(filepath2, "r");
+	FILE* arch2Recorrido = fopen(filepath2, "r");
 	char clave1 [20];
 	char clave2[20];
+	char claveComp[20];
 //	char linea [100];
 	char cadena1 [100];
 	char cadena2 [100];
 	char cadenaLeida1 [100];
 	char cadenaLeida2 [100];
+	char cadenaLeida2Rep [100];
 	bool encontrada = FALSE;
+	bool repetida = FALSE;
 	bool fin = FALSE;
 	bool archivosAbiertos = TRUE;
+	bool desordenado = FALSE;
 
 	if (arch1==NULL) {
 	   fprintf(stderr,"Error al abrir %s \n", filepath1);
@@ -137,36 +162,51 @@ void funcionJoin(char* filepath1, char* filepath2, bool ignore){
 			strcpy (cadena1, cpToken);
 			limpiar(cadena1);
 			//Buscar clave en el segundo archivo.
-			while (encontrada == FALSE && feof(arch2)==0 ){
-				fgets(cadenaLeida2, 100, arch2);
+			fgets(cadenaLeida2, 100, arch2);
+//			fgets(cadenaLeida2Rep, 100, arch2Recorrido);
+//			while ((encontrada == FALSE) && (feof(arch2)==0)){
 				cpToken = strtok (cadenaLeida2, " ");
-				strcpy (clave2, cpToken);
-				if(comparaClaves(clave1,clave2, ignore) == TRUE){
+				strcpy (claveComp, cpToken);
+				if((comparaClaves(clave1,claveComp, ignore) == TRUE)){
 					encontrada = TRUE;
+					strcpy (clave2, cpToken);
 					cpToken = strtok (NULL, "\0");
 					strcpy (cadena2, cpToken);
 					limpiar(cadena2);
+					if (encontrada == TRUE)
+						repetida = buscarRepetida(claveComp, arch2Recorrido, ignore);
 				} else {
-					//Saltear  linea
+					desordenado = TRUE;
+
 				}
-			}
+//				fgets(cadenaLeida2, 100, arch2);
+//				fgets(cadenaLeida2Rep, 100, arch2Recorrido);
+//			}
 			//Mostrar cadenas unidas.
-			if (encontrada == TRUE){
+			if (encontrada == TRUE && repetida ==FALSE){
 				printf("%s %s %s \n",clave1, cadena1, cadena2);
 				encontrada = FALSE;
 				fgets(cadenaLeida1, 100, arch1);
 				cpToken = strtok (cadenaLeida1, " ");
 				strcpy (clave1, cpToken);
-				rewind(arch2);
+//				rewind(arch2);
+				rewind(arch2Recorrido);
 			} else {
 				fin =TRUE;
 			}
 		}
 		if (fin == TRUE) {
-			fprintf(stderr,"No se encontro la clave en el segundo archivo \n");
+			if (repetida == TRUE)
+				fprintf(stderr,"Clave repetida en el archivo2. \n");
+			else
+				if (desordenado == TRUE)
+					fprintf(stderr,"El archivo 2 está desordenado. \n");
+				else
+					fprintf(stderr,"No se encontro la clave en el segundo archivo \n");
 		}
 		fclose(arch1);
 		fclose(arch2);
+		fclose(arch2Recorrido);
 	}
 }
 
