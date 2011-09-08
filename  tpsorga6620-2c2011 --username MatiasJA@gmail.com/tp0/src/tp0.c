@@ -2,12 +2,13 @@
 #include "getopt.h"
 #include "string.h"
 #include "ctype.h"
+#include "stdlib.h"
 
 typedef enum {TRUE, FALSE} bool;
 
 //Headers.
 void print_help(void);
-void funcionJoin(char* filepath1, char* filepath2, bool i);
+void funcionJoin(char* filepath1, char* filepath2, bool i, bool consola);
 void limpiar (char *cadena);
 bool comparaClaves(char* c1, char* c2, bool i);
 
@@ -26,6 +27,7 @@ int main(int argc, char **argv) {
 	//Variables de estado de los argumentos del programa.
 	bool h_flag, v_flag,i_flag;
 	bool ignore = FALSE;
+	bool consola = FALSE;
 	int c;
 
 	//Utilizo la función 'getopt_long' para analizar los argumentos.
@@ -67,7 +69,7 @@ int main(int argc, char **argv) {
 	}
 	char* filepath1;
 	char* filepath2;
-	char filepathConsole [100];
+//	char filepathConsole [100];
 	int primerPath = i + 1;
 	int segundoPath = i + 2;
 	if (argc > primerPath){
@@ -75,13 +77,37 @@ int main(int argc, char **argv) {
 		if(argc > segundoPath){
 			filepath2 = argv[segundoPath];
 		} else{
-			fgets(filepathConsole, 100, stdin);
-			limpiar(filepathConsole);
-			filepath2=&filepathConsole[0];
+			consola  =TRUE;
 		}
-		funcionJoin(filepath1, filepath2, ignore);
+		funcionJoin(filepath1, filepath2, ignore, consola);
 	}
 	return 0;
+}
+
+bool checkRepetition(FILE* arch2, char* claves[100], char* cadenas[100], bool ignore ){
+	int cantClaves = 0;
+	bool result = FALSE;
+	char cadenaLeida [100];
+	char cadenaAGuardar [100];
+	char claveLeida [20];
+	char* cpToken;
+	while(fgets(cadenaLeida,sizeof(cadenaLeida),arch2)!=NULL && result == FALSE) {
+		cpToken = strtok (cadenaLeida, " ");
+		strcpy (claveLeida, cpToken);
+		cpToken = strtok (NULL, "\0");
+		strcpy (cadenaAGuardar, cpToken);
+		limpiar(cadenaAGuardar);
+		strcpy (claves[cantClaves], claveLeida);
+		strcpy (cadenas[cantClaves], cadenaAGuardar);
+		cantClaves++;
+		int i = 0;
+		for( i = 0; i < (cantClaves-1);i++ ){
+			result = comparaClaves(claves[i],claveLeida,ignore);
+			if (result == TRUE)
+				break;
+		}
+	}
+	return result;
 }
 
 //Imprime la ayuda.
@@ -129,20 +155,30 @@ bool buscarRepetida(char* clave, FILE* archivo, bool ignore){
 		result = TRUE;
 	return result;
 }
-void funcionJoin(char* filepath1, char* filepath2, bool ignore){
+void funcionJoin(char* filepath1, char* filepath2, bool ignore, bool consola){
 
 	FILE* arch1 = fopen(filepath1, "r");
-	FILE* arch2 = fopen(filepath2, "r");
-	FILE* arch2Recorrido = fopen(filepath2, "r");
+	FILE* arch2;
+	if (consola == TRUE){
+		arch2 = stdin;
+	}else{
+		arch2 = fopen(filepath2, "r");
+	}
+
+
+	char* claves [100];
+	int j= 0;
+	for( j=0; j<100; j++ )
+	{
+	    claves[j] = malloc(21*sizeof(char));  /* 20 characters + '\0' */
+	}
+	char* cadenas[100];
+	for( j=0; j<100; j++ ) {
+		cadenas[j] = malloc(101*sizeof(char));  /* 100 characters + '\0' */
+	}
 	char clave1 [20];
-	char clave2[20];
-	char claveComp[20];
-//	char linea [100];
 	char cadena1 [100];
-	char cadena2 [100];
 	char cadenaLeida1 [100];
-	char cadenaLeida2 [100];
-	char cadenaLeida2Rep [100];
 	bool encontrada = FALSE;
 	bool repetida = FALSE;
 	bool fin = FALSE;
@@ -158,7 +194,13 @@ void funcionJoin(char* filepath1, char* filepath2, bool ignore){
 	   archivosAbiertos= FALSE;
 	}
 	char* cpToken;
+	int iteracion =0;
 	if (archivosAbiertos == TRUE){
+		repetida = checkRepetition(arch2, claves,cadenas,ignore);
+		if (repetida == TRUE)
+			fin =TRUE;
+
+
 		fgets(cadenaLeida1, 100, arch1);
 		cpToken = strtok (cadenaLeida1, " ");
 		strcpy (clave1, cpToken);
@@ -167,35 +209,21 @@ void funcionJoin(char* filepath1, char* filepath2, bool ignore){
 			strcpy (cadena1, cpToken);
 			limpiar(cadena1);
 			//Buscar clave en el segundo archivo.
-			fgets(cadenaLeida2, 100, arch2);
-//			fgets(cadenaLeida2Rep, 100, arch2Recorrido);
-//			while ((encontrada == FALSE) && (feof(arch2)==0)){
-				cpToken = strtok (cadenaLeida2, " ");
-				strcpy (claveComp, cpToken);
-				if((comparaClaves(clave1,claveComp, ignore) == TRUE)){
+			if((comparaClaves(clave1,claves[iteracion], ignore) == TRUE)){
 					encontrada = TRUE;
-					strcpy (clave2, cpToken);
-					cpToken = strtok (NULL, "\0");
-					strcpy (cadena2, cpToken);
-					limpiar(cadena2);
-					if (encontrada == TRUE)
-						repetida = buscarRepetida(claveComp, arch2Recorrido, ignore);
 				} else {
 					desordenado = TRUE;
-
 				}
-//				fgets(cadenaLeida2, 100, arch2);
-//				fgets(cadenaLeida2Rep, 100, arch2Recorrido);
-//			}
+
+
 			//Mostrar cadenas unidas.
 			if (encontrada == TRUE && repetida ==FALSE){
-				printf("%s %s %s \n",clave1, cadena1, cadena2);
+				printf("%s %s %s \n",clave1, cadena1, cadenas[iteracion]);
 				encontrada = FALSE;
+				iteracion++;
 				fgets(cadenaLeida1, 100, arch1);
 				cpToken = strtok (cadenaLeida1, " ");
 				strcpy (clave1, cpToken);
-//				rewind(arch2);
-				rewind(arch2Recorrido);
 			} else {
 				fin =TRUE;
 			}
@@ -210,8 +238,9 @@ void funcionJoin(char* filepath1, char* filepath2, bool ignore){
 					fprintf(stderr,"No se encontro la clave en el segundo archivo \n");
 		}
 		fclose(arch1);
-		fclose(arch2);
-		fclose(arch2Recorrido);
+		if (consola == FALSE)
+			fclose(arch2);
+
 	}
 }
 
