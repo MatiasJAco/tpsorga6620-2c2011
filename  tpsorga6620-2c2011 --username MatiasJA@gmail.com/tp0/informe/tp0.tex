@@ -101,6 +101,15 @@ clave de uni\'on. Si se pasa s\'olo uno de los archivos a unir, se leer\'a de la
 \subsection{Diseño e implementación}
 % falta aca explicar
 
+Detecta si hay claves repetidas en el archivo 2 y muestra 
+mensaje de error. Permite ingresar las claves y cadenas por consola
+cuando no se especifica el segundo argumento. Detecta si el archivo 2
+esta desordenado y muestra mensaje de error. 
+Para lograr el primer punto, se estan almacenando las claves y cadenas en arrays, por lo que
+el programa se limita a unir archivos de no mas de 100 claves.
+
+Lo primero que hace es revisar el archivo2 y fijarse si hay claves repetidas, si no hay, ejecuta normalmente el join.
+
 \paragraph{Proceso y salida}
 
 Primero se verifican los par\'ametros utilizados para llamar el programa. 
@@ -281,15 +290,7 @@ Salida
 
 \section{Código Fuente}
 \lstset{language=c,basicstyle=\small,showstringspaces=false,columns=fullflexible,frame=lines,tabsize=4,inputencoding=latin1,extendedchars=true}
-
-\subsection{tp0.c}
-% \lstinputlisting{../src/tp0.c}
-
-\subsection{tp0.s}
-\lstinputlisting{../assembly/tp0.s}
-
-
-\newpage
+Los archivos con los fuentes se encuentran en el CD que adjuntamos.
 
 \section{Conclusión}
 A través del trabajo práctico logramos familizarnos con herramientas del
