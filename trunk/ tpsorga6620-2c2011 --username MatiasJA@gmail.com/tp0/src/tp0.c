@@ -241,6 +241,11 @@ void funcionJoin(char* filepath1, char* filepath2, bool ignore, bool consola){
 		if (consola == FALSE)
 			fclose(arch2);
 
+		for( j=0; j<100; j++ )
+		{
+		    free(claves[j]);
+		    free(cadenas[j]);
+		}
 	}
 }
 
