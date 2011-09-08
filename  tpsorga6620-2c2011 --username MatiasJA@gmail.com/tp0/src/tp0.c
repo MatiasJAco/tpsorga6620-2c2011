@@ -47,6 +47,11 @@ int main(int argc, char **argv) {
 		}
 	}
 
+	//Si el programa se ejecuta sin ningún parametro
+	if (argc == 1) {
+		printf("No se han especificado parametros, para ayuda ejecute el programa ./tp0 \n");
+		return 0;
+	}
 	//Tomo acción en base a los argumentos pasados.
 	if (v_flag == TRUE) {
 		printf("Version 1.00\n");
