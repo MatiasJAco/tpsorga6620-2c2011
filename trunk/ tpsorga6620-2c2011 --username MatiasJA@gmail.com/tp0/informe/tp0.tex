@@ -226,31 +226,56 @@ $
 \section{Pruebas (Test)}
 Se realizaron diferentes pruebas para poder abarcar todos los casos posibles que nos permitan determinar el buen 
 funcionamiento del programa.\newline
+A continuación se muestran los archivos de prueba y la salida obtenida.
 
 \paragraph[Test1]{Prueba nº1}
-\label{Test1}
- 
-\begin{itemize}
-  \item Comando \begin{verbatim}\end{verbatim}
-  \item Salida tp0 \begin{verbatim}\end{verbatim}
-\end{itemize} 
 
-\subsection {An\'alisis de los resultados}
+Archivo 1: contiene todas las claves sin que esten repetidas ninguna de ellas.
+\verbatiminput{../pruebas/in/011}
 
-Se prosigue a detallar algunas corridas del programa en el sistema NetBSD para mostrar su funcionalidad.  \\
-A trav\'es del comando: 
+Archivo 2: contiene todas las claves, en igual forma que en el archivo 1, y estan ordenadas.
+\verbatiminput{../pruebas/in/012}
 
-\begin{verbatim}
-	.\tp0 -h
-\end{verbatim}
 
-Se imprime por pantalla el mensaje de ayudar con detalles del uso, opciones y ejemplos de uso de la aplicaci\'on: 
+Salida
+\verbatiminput{../pruebas/out/1}
 
-% \begin{figure}[h]
-% \centering
-% \includegraphics[width=400pt]{prueba1.jpg}
-% \caption{Mensaje de ayuda}
-% \end{figure}
+
+\paragraph[Test2]{Prueba nº2}
+
+\label{Test2}
+Archivo 1: contiene una clave repetida.
+\verbatiminput{../pruebas/in/021}
+
+Archivo 2: contiene todas las claves sin repetir y ordenadas.
+\verbatiminput{../pruebas/in/012}
+
+Salida
+\verbatiminput{../pruebas/out/2}
+
+\paragraph[Test3]{Prueba nº3}
+
+\label{Test3}
+Archivo 1: contiene todas las claves sin que esten repetidas ninguna de ellas.
+\verbatiminput{../pruebas/in/011}
+
+Archivo 2: contiene una clave que está repetida.
+\verbatiminput{../pruebas/in/013}
+
+Salida
+\verbatiminput{../pruebas/out/3}
+
+\paragraph[Test4]{Prueba nº4}
+
+\label{Test4}
+Archivo 1: contiene todas las claves sin que esten repetidas ninguna de ellas.
+\verbatiminput{../pruebas/in/011}
+
+Archivo 2: contiene todas las claves sin repetir, pero no están ordenadas.
+\verbatiminput{../pruebas/in/014}
+
+Salida
+\verbatiminput{../pruebas/out/4}
 
 \newpage
 
