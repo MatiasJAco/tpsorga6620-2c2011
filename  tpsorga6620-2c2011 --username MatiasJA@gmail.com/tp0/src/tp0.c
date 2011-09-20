@@ -11,7 +11,8 @@ void print_help(void);
 void funcionJoin(char* filepath1, char* filepath2, bool i, bool consola);
 void limpiar (char *cadena);
 bool comparaClaves(char* c1, char* c2, bool i);
-
+//Devuelve TRUE si c1 es consecutiva de c2.
+bool comparaClavesConsec(char* c1, char* c2, bool i);
 int main(int argc, char **argv) {
 	int i = 0;
 	//Variables especiales para la función 'getopt_long'.
@@ -183,7 +184,9 @@ void funcionJoin(char* filepath1, char* filepath2, bool ignore, bool consola){
 	bool repetida = FALSE;
 	bool fin = FALSE;
 	bool archivosAbiertos = TRUE;
-	bool desordenado = FALSE;
+	bool desordenado2 = FALSE;
+	bool desordenado1 = FALSE;
+	char historia1[20] = "";
 
 	if (arch1==NULL) {
 	   fprintf(stderr,"Error al abrir %s \n", filepath1);
@@ -212,12 +215,16 @@ void funcionJoin(char* filepath1, char* filepath2, bool ignore, bool consola){
 			if((comparaClaves(clave1,claves[iteracion], ignore) == TRUE)){
 					encontrada = TRUE;
 				} else {
-					desordenado = TRUE;
+					desordenado2 = TRUE;
 				}
+			if((comparaClavesConsec(clave1,historia1, ignore) == FALSE)){
+				desordenado1 = TRUE;
+			}
+			strcpy (historia1, clave1);
 
 
 			//Mostrar cadenas unidas.
-			if (encontrada == TRUE && repetida ==FALSE){
+			if (encontrada == TRUE && repetida ==FALSE && desordenado1==FALSE){
 				printf("%s %s %s \n",clave1, cadena1, cadenas[iteracion]);
 				encontrada = FALSE;
 				iteracion++;
@@ -227,15 +234,19 @@ void funcionJoin(char* filepath1, char* filepath2, bool ignore, bool consola){
 			} else {
 				fin =TRUE;
 			}
+
 		}
 		if (fin == TRUE) {
 			if (repetida == TRUE)
 				fprintf(stderr,"Clave repetida en el archivo2. \n");
 			else
-				if (desordenado == TRUE)
-					fprintf(stderr,"El archivo 2 está desordenado. \n");
+				if (desordenado1 == TRUE)
+					fprintf(stderr,"El archivo 1 está desordenado. \n");
 				else
-					fprintf(stderr,"No se encontro la clave en el segundo archivo \n");
+					if (desordenado2 == TRUE)
+						fprintf(stderr,"El archivo 2 está desordenado. \n");
+					else
+						fprintf(stderr,"No se encontro la clave en el segundo archivo \n");
 		}
 		fclose(arch1);
 		if (consola == FALSE)
@@ -257,6 +268,17 @@ bool comparaClaves(char* c1, char* c2, bool i){
 		if(strcasecmp(c1,c2) == 0)
 				result = TRUE;
 	}
+	return result;
+
+
+}
+bool comparaClavesConsec(char* c1, char* c2, bool i){
+	bool result = FALSE;
+	int cad1 = atoi(c1);
+	int cad2 = atoi(c2);
+	cad2++;
+	if(cad1 == cad2)
+		result = TRUE;
 	return result;
 
 
