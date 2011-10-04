@@ -3,6 +3,16 @@
 
 int Push(double *topePila,int tamanioPila,int *cantidadElementos,double valor)
 {
+	if (tamanioPila !=*cantidadElementos ){
+		int i = *cantidadElementos;
+		i++;
+		for (;i>0;i--){
+			topePila[i]= topePila[i-1];
+		}
+		topePila[0] = valor;
+		(*cantidadElementos)++;
+	}
+
 	return 1;
 }
 
