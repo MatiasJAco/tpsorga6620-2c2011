@@ -17,7 +17,14 @@ Push:
 start:
 
 	lw t1,0(a2) # i=cantElem
-	beq t1,a1,LLENO
+	beq t1,a1,ERROR #LLENO
+	mfc1 t4, $31 #chequea underflow y overflow
+	li t5, 63
+	andi t5, t4, 16
+	bnez t5, FIN #Overflow
+	li t5, 63
+	andi t5, t4, 8
+	bnez t5, FIN #Underflow
 	move t3,t1
 	add t3,t3,1
 	sw t3,0(a2)
@@ -33,15 +40,15 @@ pushElem:
 	sll t7,t1,3  #i *8
 	sll t8,t2,3  # (i-1)*8
 	add t9,a0,t7
-	add t5,a0,t8
-	l.d $f16, 0(t5)  #$f16<-pila[i-1]
+	add t6,a0,t8
+	l.d $f16, 0(t6)  #$f16<-pila[i-1]
 	add.d $f18,$f18,$f16
 	s.d $f18, 0(t9)
 	sub t1,t1,1
 	sub t1,t1,1
 	j loop
 
-LLENO:
+ERROR:
 	li v0,0
 	j FIN
 FINLOOP:
