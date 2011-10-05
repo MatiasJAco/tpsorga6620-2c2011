@@ -63,3 +63,61 @@ FIN:
 	jr ra
 .end Push
 
+  	.text
+	.align	2  	
+	.globl	SumaTotal
+	.ent SumaTotal 
+	
+SumaTotal: 	
+	.frame	$fp, 16, ra
+	.set	noreorder
+	.cpload	t9
+	.set	reorder
+	subu	sp, sp, 16
+	.cprestore	4
+	
+	sw		ra, 0(sp)
+	sw		$fp, 8(sp)
+	move	$fp, sp  # Guarda el parametro en el stack
+	
+	# SumaTotal(double *topePila,int tamanioPila, int *cantidadElementos, double *resultadoSuma)	
+	sw		a0,16($fp)		#double *topePila
+	sw		a1,20($fp)		#int tamanioPila
+	sw		a2,24($fp)		#int *cantidadElementos
+	sw		a3,28($fp)		#double *resultadoSuma 	
+	
+	lw	t0,20($fp)	#	tamanioPila 
+	lw	t1,24($fp)	# 	int* cantidadElementos
+	lw	t1,0(t1)	# 	cantidadElementos
+	
+	#if (tamanioPila > (*cantidadElementos))
+	bgt	t0,t1,init_sum	
+	move t1, t0			#n = tamanioPila
+	
+init_sum:	
+	lw	t0,16($fp)		# $f0 = topePila[n]
+	l.d	$f0,0(t0)
+	
+sumar:
+	subu	t1, t1, 1 # n--
+	blez	t1,fin	  # n < 0 ?	
+	
+	addi	t0, t0,8	
+	l.d		$f2,0(t0)	# $f2 = topePila[n]
+	add.d	$f0,$f0,$f2	# $f0 = $f0 + $f2
+	
+	j	sumar
+
+	
+	lw		t3,28($fp)
+	s.d		$f0,0(t3)
+	addi	v0,zero,1	
+
+	move	sp,$fp
+	lw		ra,0(sp)
+	lw		$fp,8(sp)	
+	addu	sp,sp,16
+	jr		ra 
+	
+.end SumaTotal
+
