@@ -152,12 +152,26 @@ Procesar:
 	lw		t1,24($fp)		#cargo el puntero en t1
 	sw		v0,0(t1)		#guardo el nuevo valor
 
-	sll		t1,v0,3			#ajusto el puntero segun el tamaño de la variable
-	lw		v0,16($fp)		#cargo el puntero a la base de la pila
-	addu		v0,t1,v0		#me posiciono en la direccion de memoria del elemento a tomar
+	move		t1,v0			#guardo nueva cantidad de elementos en t1
+	lw		v0,16($fp)		#cargo el puntero al tope de la pila	
 	l.d		$f0,0(v0)		#leo el double en f0
 	lw		t2,28($fp)		#cargo el puntero al double a devolver
 	s.d		$f0,0(t2)		#cargo el double en la direccion apuntada por t2
+
+	add t3,zero,zero  #inicializo iterador i
+	add t4,zero,zero
+	add t4,t4,1
+CompararCant:	beq t3,t1,FinOK
+sig:
+	sll t5,t3,3 	# i*8
+	sll t6,t4,3 	# (i+1)*8
+	add t7,v0,t5
+	add t8,v0,t6
+	l.d $f0,0(t8)   # $f1<-pila[i+1]
+	s.d $f0,0(t7)   # pila[i]<-$f1
+	add t3,t3,1
+	add t4,t4,1
+	j CompararCant
 
 FinOK:
 	li		v0,1
