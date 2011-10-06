@@ -10,30 +10,30 @@ Push:
 	sw gp,0(sp)
 	move $fp,sp
 
-	sw a0,8(sp)
-	sw a1,12(sp)
-	sw a2,16(sp)
-	l.d $f2,24(sp)	#24 :8+16
+	sw a0,8(sp) 		#double *topePila
+	sw a1,12(sp)		#int tamanioPila
+	sw a2,16(sp)		#int *cantidadElementos
+	l.d $f2,24(sp)	#24 :8+16 double valor
 start:
 
-	lw t1,0(a2) # i=cantElem
-	beq t1,a1,ERROR #LLENO
-	mfc1 t4, $31 #chequea underflow y overflow
+	lw t1,0(a2) 		# i=cantElem
+	beq t1,a1,ERROR 		#LLENO
+	mfc1 t4, $31	 #chequea underflow y overflow
 	li t5, 63
 	andi t5, t4, 16
-	bnez t5, FIN #Overflow
+	bnez t5, FIN 	#Overflow
 	li t5, 63
 	andi t5, t4, 8
-	bnez t5, FIN #Underflow
+	bnez t5, FIN 	#Underflow
 	move t3,t1
-	add t3,t3,1
+	add t3,t3,1   	#incrementa cantidadElementos
 	sw t3,0(a2)
 	move t2,t1
-	sub t2,t2,1 # i-1
+	sub t2,t2,1 	# i-1
 
 
 loop:
-	bgtz t1,pushElem
+	bgtz t1,pushElem	#Si no esta vacio desplaza los elementos en la pila.
 	j FINLOOP
 
 pushElem:
@@ -42,19 +42,16 @@ pushElem:
 	add t9,a0,t7
 	add t6,a0,t8
 	l.d $f16, 0(t6)  #$f16<-pila[i-1]
-	li.s $f18,0.0
-	li.s $f19,0.0
-	add.d $f18,$f18,$f16
-	s.d $f18, 0(t9)
-	sub t1,t1,1
-	sub t2,t2,1
+	s.d $f16, 0(t9) #pila[i] <- $f16
+	sub t1,t1,1    # i--
+	sub t2,t2,1    #(i-1)--
 	j loop
 
 ERROR:
-	li v0,0
+	li v0,0  # Si esta lleno o hubo error devolver 0 
 	j FIN
 FINLOOP:
-	s.d $f2,0(a0)
+	s.d $f2,0(a0) # tope = valor
 	li v0,1
 
 FIN:
