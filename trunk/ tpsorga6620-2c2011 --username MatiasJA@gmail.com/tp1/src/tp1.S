@@ -72,21 +72,20 @@ SumaTotal:
 	.set	noreorder
 	.cpload	t9
 	.set	reorder
-	subu	sp, sp, 16
+	subu	sp, sp, 8
 	.cprestore	4
-	
-	sw		ra, 0(sp)
-	sw		$fp, 8(sp)
-	move	$fp, sp  # Guarda el parametro en el stack
+	sw $fp,4(sp)
+	sw gp,0(sp)
+	move $fp,sp # Guarda el parametro en el stack
 	
 	# SumaTotal(double *topePila,int tamanioPila, int *cantidadElementos, double *resultadoSuma)	
-	sw		a0,16($fp)		#double *topePila
-	sw		a1,20($fp)		#int tamanioPila
-	sw		a2,24($fp)		#int *cantidadElementos
-	sw		a3,28($fp)		#double *resultadoSuma 	
+	sw		a0,8($fp)		#double *topePila
+	sw		a1,12($fp)		#int tamanioPila
+	sw		a2,16($fp)		#int *cantidadElementos
+	sw		a3,20($fp)		#double *resultadoSuma 	
 	
-	lw	t0,20($fp)	#	tamanioPila 
-	lw	t1,24($fp)	# 	int* cantidadElementos
+	lw	t0,12($fp)	#	tamanioPila 
+	lw	t1,16($fp)	# 	int* cantidadElementos
 	lw	t1,0(t1)	# 	cantidadElementos
 	
 	# si (tamanioPila > (*cantidadElementos))
@@ -94,7 +93,7 @@ SumaTotal:
 	move t1, t0			#n = tamanioPila
 	
 init_sum:	
-	lw	t0,16($fp)		# $f0 = topePila[n]
+	lw	t0,8($fp)		# $f0 = topePila[n]
 	l.d	$f0,0(t0)
 	
 sumar:
@@ -108,13 +107,25 @@ sumar:
 	j	sumar
 
 	
-fin:	lw		t3,28($fp)
+fin:	
+	mfc1 t4, $31	 #chequea underflow y overflow
+	li t5, 63
+	andi t5, t4, 16
+	bnez t5, ERROR_END 	#Overflow
+	li t5, 63
+	andi t5, t4, 8
+	bnez t5, ERROR_END 	#Underflow
+	lw		t3,20($fp)
 	s.d		$f0,0(t3)
 	addi	v0,zero,1	
+	j STACK_DEL
+ERROR_END:
+	addi	v0,zero,0
 
+STACK_DEL:
 	move	sp,$fp
-	lw		ra,0(sp)
-	lw		$fp,8(sp)	
+	lw		gp,0(sp)
+	lw		$fp,4(sp)	
 	addu	sp,sp,16
 	jr		ra 
 	
@@ -161,7 +172,9 @@ Procesar:
 	add t3,zero,zero  #inicializo iterador i
 	add t4,zero,zero
 	add t4,t4,1
-CompararCant:	beq t3,t1,FinOK
+CompararCant:	
+
+	beq t3,t1,FinOK
 sig:
 	sll t5,t3,3 	# i*8
 	sll t6,t4,3 	# (i+1)*8
@@ -179,6 +192,7 @@ FinOK:
 
 Fin:
 	move		sp,$fp
+	lw		gp,8(sp)
 	lw		$fp,12(sp)
 	addu		sp,sp,16
 	j		ra
