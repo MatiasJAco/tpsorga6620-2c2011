@@ -1,0 +1,263 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[spanish]{babel}
+\usepackage{multirow}
+\usepackage{verbatim}
+\usepackage{moreverb}
+\usepackage{graphicx}
+
+%Idioma
+\usepackage[latin1]{inputenc}
+%Letra arial
+\usepackage{helvet}
+%\renewcommand\familydefault{\sfdefault}
+%Para incluir codigo fuente
+\usepackage{listings}
+%Para tener encabezados y pie de pagina personalizados
+\usepackage{fancyhdr}
+%Para poner eprafe en las imagenes
+\usepackage[hang,bf]{caption2}
+
+%%------------Gráficos------------
+%%Paquete de gráficos
+%\newif\ifpdf
+%\ifx\pdfoutput\undefined
+%	\pdffalse
+%\else
+%	\pdfoutput=1
+%	\pdftrue
+%\fi
+%
+%\ifpdf
+%	\usepackage[pdftex]{graphicx}
+%	\pdfcompresslevel=9
+%% 	\pdfcompresslevel=0
+%	\usepackage{pdfpages}
+%\else
+%	\usepackage[dvips]{graphicx}
+%\fi
+
+
+
+% Titulo del Trabajo Practico.
+\title{ Trabajo Pr\'actico 2: MIPS Datapath   \\
+        \Large{ 66.20 Organizaci\'on de las Computadoras } }
+
+
+% Informaci\'on sobre los autores.
+\author{Nicol\'as Calvo, \textit{Padr\'on Nro. 78.914}           	\\
+            \texttt{ nicolas.g.calvo@gmail.com }      			\\
+            Celeste Maldonado, \textit{Padr\'on Nro. 85.630}              	\\
+            \texttt{ maldonado.celeste@gmail.com }                             \\
+            Matias Acosta, \textit{Padr\'on Nro. 88.590}                \\
+            \texttt{ matiasja@gmail.com }                     		\\
+            \LARGE{}         						\\
+            \LARGE{}         						\\
+            \LARGE{}         						\\
+            \Large{2do. Cuatrimestre de 2011}         	\\                       
+            \texttt{}         						\\
+            \Large{Facultad de Ingenier\'\i{}a, Universidad de Buenos Aires}            \\
+       }
+\date{}
+
+
+
+\begin{document}
+
+\begin{figure}
+\centering
+\includegraphics[width=100pt]{logofiuba.jpg}
+\end{figure}
+
+
+\maketitle
+\thispagestyle{empty}   % quita el numero en la primer pagina
+%\renewcommand{\labelenumi}{\alph{enumi}.}
+
+
+\newpage
+% Declaro el indice
+
+\tableofcontents
+\newpage
+
+\setcounter{page}{1}
+
+\section{Introducci\'on}
+
+
+\paragraph{}
+
+
+\section{Desarrollo}
+
+\begin{enumerate}
+
+\item	
+\item	
+\item 
+\item
+
+
+\paragraph{Ejecuci\'on del programa sin forwarding}
+
+
+\paragraph{}
+Se ejecutan 129 ciclos y 64 instrucciones , con 2 instrucciones en el  pipeline al finalizar.
+
+\paragraph{}
+\begin{center}
+$CPI = 129 ciclos / 64 instrucciones = 2.02$
+\end{center}
+
+\paragraph{}
+Se contaron un total de 64 stalls, divididos en las siguientes categorías:
+
+\begin{itemize}
+\item 10 stalls de control (7.75% de todos los ciclos)
+\item 2  stalls correspondientes a la instruccion trap (1.55% de todos los ciclos)
+\item 52 stalls RAW (Read After Write) (40.31% de todos los ciclos).
+\end{itemize}
+
+\paragraph{Ejecuci\'on del programa con forwarding:}
+
+
+\paragraph{}
+Se ejecutan 98 ciclos y 64 instrucciones , con 2 instrucciones en el  pipeline al finalizar.
+
+\paragraph{}
+\begin{center}
+$CPI = 98 ciclos / 64 instrucciones = 1,53$
+\end{center}
+
+\paragraph{}
+Se logr\'o un $SpeedUp = 1.32$
+
+\paragraph{} 
+Se contaron un total de 33 stalls, divididos en las siguientes categorías:
+
+\begin{itemize}
+\item 10 stalls de control (10.20% de todos los ciclos)
+\item 2  stalls correspondientes a la instruccion trap (2.04\% de todos los ciclos)
+\item 21 stalls RAW (Read After Write) (21.43\% de todos los ciclos), de los cuales los 21 corresponden a stalls de branch, es decir, que dichos branches tienen por argumentos registros escritos en la instruccion que los precede.
+\end{itemize}
+
+\paragraph{} 
+Para el codigo presentado Branch Delay Slot no podría usarse para lograr una mejora significativa en tiempo de ejecuci\'on debido a las dependencias de los branches respecto a los argumentos de las instrucciones que se ejecutan antes y despues de ellos.
+
+\paragraph{} 
+Por ejemplo, para el segmento:
+
+\begin{center}
+\begin{verbatim}
+		andi r3,r2,#1 
+		bnez r3,Modulo 
+		add r1,r1,r2 
+Modulo:	sgt r8,r1,r6
+\end{verbatim}
+\end{center}
+
+\paragraph{} 
+La instruccion andi se usa en el branch, por lo que no puede moverse al delay slot y sgt requiere de un registro que es modificado en caso de no tomar el branch, por lo que mover esta instruccion al delay slot modificaría la logica del programa.
+
+
+\item
+
+\paragraph{} 
+Se reorden\'o el codigo moviendo a la instrucci\'on 
+
+\begin{verbatim}
+andi r3,r2,#1 
+\end{verbatim}
+
+
+de la siguiente forma:
+
+\paragraph{}
+Codigo original:
+
+\begin{center}
+\begin{verbatim}
+	sge r8,r2,r5
+	bnez r8,Fin 
+	andi r3,r2,#1 
+	bnez r3,Modulo 
+	add r1,r1,r2
+\end{verbatim}
+\end{center}
+
+\paragraph{} 
+Codigo reordenado:
+
+\begin{center}
+\begin{verbatim}
+	sge r8,r2,r5 
+	andi r3,r2,#1 
+	bnez r8,Fin 	 
+	bnez r3,Modulo 
+	add r1,r1,r2
+\end{verbatim}
+\end{center}
+
+\paragraph{}
+De esta forma se espera reducir los ciclos de stall RAW para que bnez r3, Modulo tenga disponible el valor del registro r3. Algo similar sucedería para bnez r8,Fin respecto a sge r8,r2,r5.
+
+\paragraph{}
+Se obtuvieron los siguientes resultados:
+
+\paragraph{Ejecucion sin forwarding:}
+
+\paragraph{}
+Se ejecutan 108 ciclos y 64 instrucciones , con 2 instrucciones en el  pipeline al finalizar.
+
+\begin{center}
+$CPI = 108 ciclos / 64 instrucciones = 1.69 $
+\end{center}
+
+\paragraph{}
+Se contaron un total de 43 stalls, divididos en las siguientes categorías:
+
+\begin{itemize}
+ \item 10 stalls de control (9.26% de todos los ciclos)
+ \item  2  stalls correspondientes a la instruccion trap (1.85% de todos los ciclos)
+ \item  31 stalls RAW (Read After Write) (28.70% de todos los ciclos)
+\end{itemize}
+
+\paragraph{}
+SpeedUp respecto al codigo $sin reordenamiento = 1.2$
+
+\paragraph{Ejecuci\'on con forwarding:}
+
+\paragraph{}9
+Se ejecutan 84 ciclos y 64 instrucciones , con 2 instrucciones en el  pipeline al finalizar.
+
+\begin{center}
+$CPI = 84 ciclos / 64 instrucciones = 1.31$
+\end{center}
+
+\paragraph{}
+SpeedUp respecto al codigo$ sin reordenamiento = 1.17$
+
+\paragraph{} 
+Se contaron un total de 19 stalls, divididos en las siguientes categor'ias:
+
+\begin{itemize}
+ \item 10 stalls de control (11.09% de todos los ciclos)
+ \item  stalls correspondientes a la instruccion trap (2.38% de todos los ciclos)
+ \item stalls RAW (Read After Write) (8.33% de todos los ciclos), de los cuales los 7 corresponden a stalls de branch, es decir, que dichos branches tienen por argumentos registros escritos en la instruccion que los precede.
+\end{itemize}
+
+
+\item
+
+
+
+
+\end{enumerate}
+
+\section{Conclusi\'on}
+
+
+
+\end{document}
+
