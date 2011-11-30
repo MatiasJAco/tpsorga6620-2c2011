@@ -111,7 +111,7 @@ $CPI = 129 ciclos / 64 instrucciones = 2.02$
 \end{center}
 
 \paragraph{}
-Se contaron un total de 64 stalls, divididos en las siguientes categor√≠as:
+Se contaron un total de 64 stalls, divididos en las siguientes categor\'ias:
 
 \begin{itemize}
 \item 10 stalls de control (7.75% de todos los ciclos)
@@ -134,7 +134,7 @@ $CPI = 98 ciclos / 64 instrucciones = 1,53$
 Se logr\'o un $SpeedUp = 1.32$
 
 \paragraph{} 
-Se contaron un total de 33 stalls, divididos en las siguientes categor√≠as:
+Se contaron un total de 33 stalls, divididos en las siguientes categor\'ias:
 
 \begin{itemize}
 \item 10 stalls de control (10.20% de todos los ciclos)
@@ -143,7 +143,7 @@ Se contaron un total de 33 stalls, divididos en las siguientes categor√≠as:
 \end{itemize}
 
 \paragraph{} 
-Para el codigo presentado Branch Delay Slot no podr√≠a usarse para lograr una mejora significativa en tiempo de ejecuci\'on debido a las dependencias de los branches respecto a los argumentos de las instrucciones que se ejecutan antes y despues de ellos.
+Para el codigo presentado Branch Delay Slot no podr\'i≠a usarse para lograr una mejora significativa en tiempo de ejecuci\'on debido a las dependencias de los branches respecto a los argumentos de las instrucciones que se ejecutan antes y despues de ellos.
 
 \paragraph{} 
 Por ejemplo, para el segmento:
@@ -158,7 +158,7 @@ Modulo:	sgt r8,r1,r6
 \end{center}
 
 \paragraph{} 
-La instruccion andi se usa en el branch, por lo que no puede moverse al delay slot y sgt requiere de un registro que es modificado en caso de no tomar el branch, por lo que mover esta instruccion al delay slot modificar√≠a la logica del programa.
+La instruccion andi se usa en el branch, por lo que no puede moverse al delay slot y sgt requiere de un registro que es modificado en caso de no tomar el branch, por lo que mover esta instruccion al delay slot modificar\'i≠a la logica del programa.
 
 
 \item
@@ -200,7 +200,7 @@ Codigo reordenado:
 \end{center}
 
 \paragraph{}
-De esta forma se espera reducir los ciclos de stall RAW para que bnez r3, Modulo tenga disponible el valor del registro r3. Algo similar suceder√≠a para bnez r8,Fin respecto a sge r8,r2,r5.
+De esta forma se espera reducir los ciclos de stall RAW para que bnez r3, Modulo tenga disponible el valor del registro r3. Algo similar suceder\'i≠a para bnez r8,Fin respecto a sge r8,r2,r5.
 
 \paragraph{}
 Se obtuvieron los siguientes resultados:
@@ -215,7 +215,7 @@ $CPI = 108 ciclos / 64 instrucciones = 1.69 $
 \end{center}
 
 \paragraph{}
-Se contaron un total de 43 stalls, divididos en las siguientes categor√≠as:
+Se contaron un total de 43 stalls, divididos en las siguientes categor\'i≠as:
 
 \begin{itemize}
  \item 10 stalls de control (9.26% de todos los ciclos)
@@ -239,7 +239,7 @@ $CPI = 84 ciclos / 64 instrucciones = 1.31$
 SpeedUp respecto al codigo$ sin reordenamiento = 1.17$
 
 \paragraph{} 
-Se contaron un total de 19 stalls, divididos en las siguientes categor'ias:
+Se contaron un total de 19 stalls, divididos en las siguientes categor\'ias:
 
 \begin{itemize}
  \item 10 stalls de control (11.09% de todos los ciclos)
@@ -249,13 +249,154 @@ Se contaron un total de 19 stalls, divididos en las siguientes categor'ias:
 
 
 \item
+\paragraph{Riesgos Estructurales}
 
+\paragraph{}
+Hay situaciones, llamadas riesgos (hazards), que impiden que se ejecute la siguiente instrucci\'on del flujo de instrucciones durante su ciclo de reloj designado por la segmentaci\'on (pipeline).
+
+\paragraph{}
+Los riesgos reducen el rendimiento de la velocidad ideal lograda por la segmentaci\'on. Hay tres clases de riesgos:
+\paragraph{}
+1. Riesgos estructurales surgen de conflictos de los recursos, cuando el hardware no puede soportar todas las combinaciones posibles de instrucciones en ejecuciones solapadas simult\'aneamente.
+\paragraph{}
+2. Riesgos por dependencias de datos surgen cuando una instrucci\'on depende de los resultados de una instrucci\'on anterior, de forma que, ambas, podr\'ian llegar a ejecutarse de forma solapada.
+\paragraph{}
+3. Riesgos de control surgen de la segmentaci\'on de los saltos y otras instrucciones que cambian el PC.
+
+\paragraph{}
+Los riesgos en la segmentaci\'on pueden hacer necesario detenerla. Normalmente, cuando una instrucci\'on est\'a detenida, todas las instrucciones posteriores a esta instrucci\'on tambi\'en se detienen.
+
+\paragraph{}
+Riesgos por dependencias de datos:
+\paragraph{}
+El problema de la dependencia de datos entre una instrucci\'on I1 y otra I2 que sigue, puede prevenirse retrasando la ejecuci\'on de I2 un n\'umero de K de etapas hasta que desaparezca el problema de que I2 lea un operando que I1 no ha escrito todav\'ia. 
+\paragraph{}
+Este retraso puede conseguirse insertando un n\'umero K de instrucciones entre I1 e I2. Esto significa que el compilador tiene que reordenar el programa para encontrar K instrucciones que puedan ejecutarse despu\'es de I1 y antes de I2 sin que ello var\'ie la estructura l\'ogica del problema.
+\paragraph{}
+Si el compilador no puede reorganizar el c\'odigo para encontrar esas K instrucciones antes mencionadas, sin modificar la l\'ogica del programa, debe insertar operaciones NOP (no operaci\'on) entre I1 e I2.
+
+\paragraph{}
+Si se trata de una instrucci\'on de salto, hasta que no llega a la etapa de ejecuci\'on no se establece en el PC la direcci\'on de la siguiente instrucci\'on a ejecutar, por lo que la etapa alimentaci\'on de instrucci\'on no sabe por donde seguir alimentando instrucciones. La etapa de alimentaci\'on no puede extraer la siguiente instrucci\'on a una bifurcaci\'on hasta que esta \'ultima no finalice su etapa de ejecuci\'on, \'esta tendr\'ia que esperar hasta que se alimente la siguiente instrucci\'on y vaya avanzando por todos las etapas anteriores, que se habr\'an quedado vac\'ias. A estas etapas vac\'ias se las llama huecos de retardo (delay slots).
+\paragraph{}
+Nos encontramos con la misma soluci\'on, en la cual debemos reorganizar el c\'odigo para rellenar los huecos de retardo con instrucciones \'utiles.
+Si no es posible reordenar el c\'odigo sin afectar la sem\'antica, se debe insertar operaciones NOP en los huecos de retardo.
+
+\paragraph{}
+A continuaci\'on mostraremos un segmento de c\'odigo con riesgo RAW:
+
+
+\begin{center}
+\begin{verbatim}
+main:
+                add             r1,r2,r3
+                lw              r4,0(r1)        ;load into r4 using r1
+                sw              12(r1),r4       ;store r4 using r1
+                lw              r1,0(r2)
+                sub             r4,r1,r5
+                and             r6,r1,r7
+                or              r8,r1,r9
+Finish:       
+                trap            0
+\end{verbatim}
+\end{center}
+
+\paragraph{}
+\centering
+\includegraphics[width=470pt]{punto5-1.JPG}
+
+
+\paragraph{}
+Ahora, utilizaremos nop para evitar los riesgos producidos.
+\begin{center}
+\begin{verbatim}
+main:
+                add             r1,r2,r3
+                lw              r4,0(r1)        ;load into r4 using r1
+				nop
+                sw              12(r1),r4       ;store r4 using r1
+                lw              r1,0(r2)
+				nop
+                sub             r4,r1,r5
+                and             r6,r1,r7
+                or              r8,r1,r9
+Finish:       
+                trap            0
+\end{verbatim}
+\end{center}
+
+\paragraph{}
+\centering
+\includegraphics[width=470pt]{punto5-2.JPG}
+
+\paragraph{}
+Como se puede apreciar, no hay beneficio en cuanto a la cantidad de ciclos necesarios para ejecutar el programa.
+
+\paragraph{}
+Ahora veremos un riesgo por salto condicional.
+
+\begin{center}
+\begin{verbatim}
+		.data 0
+dato: 	.word 1
+		.text
+main:
+		addi r20, r0, dato
+		addi r30, r0, 20
+		xor r1, r1, r1
+loop: 	xor r2, r2, r2
+		and r3, r4, r5
+		subui r30, r30, 1
+		add r6, r7, r8
+		add r9, r10, r11
+		addui r1, r1, 1
+		bnez r30, loop
+		trap #0
+\end{verbatim}
+\end{center}
+
+\paragraph{}
+\centering
+\includegraphics[width=470pt]{punto5-3.JPG}
+
+\paragraph{}
+\begin{center}
+\begin{verbatim}
+Ahora utilizando nop:
+
+		.data 0
+dato: 	.word 1
+		.text
+main:
+		addi r20, r0, dato
+		addi r30, r0, 20
+		xor r1, r1, r1
+loop: 	xor r2, r2, r2
+		and r3, r4, r5
+		subui r30, r30, 1
+		add r6, r7, r8
+		add r9, r10, r11
+		addui r1, r1, 1
+		bnez r30, loop
+		nop
+		trap #0
+\end{verbatim}
+\end{center}
+
+\paragraph{}
+\centering
+\includegraphics[width=470pt]{punto5-4.JPG}
+
+\paragraph{}
+Se puede ver que el segmento de c\'odigo se ha ejecutado en 168 ciclos, uno m\'as que sin utilizar el comando NOP.
 
 
 
 \end{enumerate}
 
+\newpage
 \section{Conclusi\'on}
+\paragraph{}
+Como conclusi\'on, podemos decir que el comando NOP, solo sirve para evitar riesgos pero no para acelerar el procesamiento del c\'odigo.
 
 
 
