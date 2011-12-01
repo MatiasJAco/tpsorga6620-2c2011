@@ -39,3 +39,45 @@ main:
 
 Fin:	;***end
 	trap		0
+	
+	
+
+	.data
+	.global		A
+	.global		B
+	.global		C
+	.global		D
+	.global		E
+	
+A: 	.float 4
+B: 	.float 5
+C: 	.float 7
+D: 	.float 3
+E:	.float 3
+
+.text
+.global main
+
+main:
+
+	lf f1, A
+	lf f2, B
+	lf f3, C
+	lf f4, D
+
+	addf f5, f2, f3 ;X= B+C
+	subf f6, f4, f3 ;Y= D-C
+
+	addf f7, f1, f3 ; A+C
+	subf f7, f7, f2
+	multf f7, f7, f3
+	subf f7, f7, f5
+
+	divf f8,f6,f7
+	
+	lf  f9, E
+	multf f5, f5, f6
+	multf f5, f5, f9
+
+Fin:	;***end
+	trap 0
