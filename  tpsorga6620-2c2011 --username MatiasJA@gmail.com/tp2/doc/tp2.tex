@@ -85,18 +85,67 @@
 
 \section{Introducci\'on}
 
+\paragraph{}
+En este trabajo, se busca el objetivo de familiarizarse con el camino de datos de la arquitectura MIPS y la implementaci\'on del pipeline de cinco etapas. 
 
 \paragraph{}
+Para la realizaci\'on del trabajo pr\'actico se implementaron segmentos de c\'odigo Assembly MIPS que fueron analizados posteriormente mediante a herramienta de simulaci\'on WinDLX .
 
+\paragraph{}
+La herramienta WinDLX permite simular una arquitectura MIPS 32 con pipeline de cinco etapas, pudiendo ver los valores de cada registro dentro del archivo de registros, la ejecuci\'on de instrucciones dentro de cada etapa del pipeline  y el acceso a estad\'isticas  de la ejecuci\'on, como la cantidad de ciclos que requiri\'o la ejecuci\'on o la cantidad y tipos de ciclos de stall.
+
+\paragraph{}
+Los resultados se analizaron con la opci\'on de forwarding activada y sin activar. 
+Forwarding es la t\'ecnica utilizada para reducir la cantidad de ciclos de stall producidos ante un riesgo Read after Write (RAW), la cual consiste en adelantar el resultado de la etapa de ejecuci\'on de la instrucci\'on que escribe el registro a ser le\'ido en una instrucci\'on pr\'oxima, de manera que las instrucciones siguientes que requieran del contenido actualizado de dicho registro puedan acceder al mismo antes de haber sido escrito en la etapa de Write-Back.
+
+\newpage 
 
 \section{Desarrollo}
 
 \begin{enumerate}
 
-\item	
-\item	
-\item 
-\item
+% PUNTO 1
+\item  Realizar las siguientes operaciones:
+
+\begin{center}
+\begin{verbatim}
+A=4
+B=5
+C=7
+D=3
+X=B+C
+Y=D-C
+Z=(((((A+C)-B)*C)-X)/Y)
+A=X*Y*3
+\end{verbatim}
+\end{center}
+
+Donde las variables A,B,C,D est\'an en memoria. La variable Z es de tipo double. Determinar el CPI para el conjunto de las operaciones, cantidad y tipo de Stalls.
+
+\paragraph{}
+\underline{\textsc{Resoluci\'on:}}
+
+\newpage
+
+% PUNTO 2
+\item	Realizar un reordenamiento del c\'odigo assembly implementado en el \'item anterior que disminuya el CPI.
+
+\paragraph{}
+\textbf{Resoluci\'on:}
+
+
+\newpage
+% PUNTO 3
+\item Implementar el siguiente segmento de c\'odigo en Assembly MIPS:
+
+
+\lstset{language=c,basicstyle=\small,showstringspaces=false,columns=fullflexible,frame=lines,tabsize=4,inputencoding=latin1,extendedchars=true}
+\lstinputlisting{E3_codigoc.c}
+
+Determinar el CPI para el conjunto de las operaciones, cantidad y tipo de Stalls. Verificar la posibilidad de utilizar branch delay slot para realizar una mejora en el tiempo de ejecuci\'on.
+
+\paragraph{}
+\underline{\textsc{Resoluci\'on:}}
 
 
 \paragraph{Ejecuci\'on del programa sin forwarding}
@@ -111,6 +160,7 @@ $CPI = 129 ciclos / 64 instrucciones = 2.02$
 \end{center}
 
 \paragraph{}
+
 Se contaron un total de 64 stalls, divididos en las siguientes categor\'ias:
 
 \begin{itemize}
@@ -134,6 +184,7 @@ $CPI = 98 ciclos / 64 instrucciones = 1,53$
 Se logr\'o un $SpeedUp = 1.32$
 
 \paragraph{} 
+
 Se contaron un total de 33 stalls, divididos en las siguientes categor\'ias:
 
 \begin{itemize}
@@ -143,7 +194,8 @@ Se contaron un total de 33 stalls, divididos en las siguientes categor\'ias:
 \end{itemize}
 
 \paragraph{} 
-Para el codigo presentado Branch Delay Slot no podr\'i­a usarse para lograr una mejora significativa en tiempo de ejecuci\'on debido a las dependencias de los branches respecto a los argumentos de las instrucciones que se ejecutan antes y despues de ellos.
+Para el codigo presentado Branch Delay Slot no podrÃ­a usarse para lograr una mejora significativa en tiempo de ejecuci\'on debido a las dependencias de los branches respecto a los argumentos de las instrucciones que se ejecutan antes y despues de ellos.
+
 
 \paragraph{} 
 Por ejemplo, para el segmento:
@@ -158,10 +210,18 @@ Modulo:	sgt r8,r1,r6
 \end{center}
 
 \paragraph{} 
-La instruccion andi se usa en el branch, por lo que no puede moverse al delay slot y sgt requiere de un registro que es modificado en caso de no tomar el branch, por lo que mover esta instruccion al delay slot modificar\'i­a la logica del programa.
 
+La instruccion andi se usa en el branch, por lo que no puede moverse al delay slot y sgt requiere de un registro que es modificado en caso de no tomar el branch, por lo que mover esta instruccion al delay slot modificar\'iï¿½a la logica del programa.
 
+\newpage
+
+% PUNTO 4
 \item
+
+Realizar un reordenamiento del c\'odigo assembly implementado en el \'item anterior que disminuya el CPI.
+
+\paragraph{}
+\underline{\textsc{Resoluci\'on:}}
 
 \paragraph{} 
 Se reorden\'o el codigo moviendo a la instrucci\'on 
@@ -200,7 +260,8 @@ Codigo reordenado:
 \end{center}
 
 \paragraph{}
-De esta forma se espera reducir los ciclos de stall RAW para que bnez r3, Modulo tenga disponible el valor del registro r3. Algo similar suceder\'i­a para bnez r8,Fin respecto a sge r8,r2,r5.
+
+De esta forma se espera reducir los ciclos de stall RAW para que bnez r3, Modulo tenga disponible el valor del registro r3. Algo similar suceder\'ia para bnez r8,Fin respecto a sge r8,r2,r5.
 
 \paragraph{}
 Se obtuvieron los siguientes resultados:
@@ -215,7 +276,8 @@ $CPI = 108 ciclos / 64 instrucciones = 1.69 $
 \end{center}
 
 \paragraph{}
-Se contaron un total de 43 stalls, divididos en las siguientes categor\'i­as:
+
+Se contaron un total de 43 stalls, divididos en las siguientes categor\'ias:
 
 \begin{itemize}
  \item 10 stalls de control (9.26% de todos los ciclos)
@@ -239,6 +301,7 @@ $CPI = 84 ciclos / 64 instrucciones = 1.31$
 SpeedUp respecto al codigo$ sin reordenamiento = 1.17$
 
 \paragraph{} 
+
 Se contaron un total de 19 stalls, divididos en las siguientes categor\'ias:
 
 \begin{itemize}
@@ -247,12 +310,14 @@ Se contaron un total de 19 stalls, divididos en las siguientes categor\'ias:
  \item stalls RAW (Read After Write) (8.33% de todos los ciclos), de los cuales los 7 corresponden a stalls de branch, es decir, que dichos branches tienen por argumentos registros escritos en la instruccion que los precede.
 \end{itemize}
 
+\newpage
 
-\item
+% PUNTO 5
+\item Implementar un segmento de c\'odigo que con la adici\'on de instrucciones de tipo nop mejore su desempeno. Si no fuera posible, explicar los motivos.
+
+\underline{\textsc{Resoluci\'on:}}
+
 \paragraph{Riesgos Estructurales}
-
-\paragraph{}
-Hay situaciones, llamadas riesgos (hazards), que impiden que se ejecute la siguiente instrucci\'on del flujo de instrucciones durante su ciclo de reloj designado por la segmentaci\'on (pipeline).
 
 \paragraph{}
 Los riesgos reducen el rendimiento de la velocidad ideal lograda por la segmentaci\'on. Hay tres clases de riesgos:
@@ -262,9 +327,6 @@ Los riesgos reducen el rendimiento de la velocidad ideal lograda por la segmenta
 2. Riesgos por dependencias de datos surgen cuando una instrucci\'on depende de los resultados de una instrucci\'on anterior, de forma que, ambas, podr\'ian llegar a ejecutarse de forma solapada.
 \paragraph{}
 3. Riesgos de control surgen de la segmentaci\'on de los saltos y otras instrucciones que cambian el PC.
-
-\paragraph{}
-Los riesgos en la segmentaci\'on pueden hacer necesario detenerla. Normalmente, cuando una instrucci\'on est\'a detenida, todas las instrucciones posteriores a esta instrucci\'on tambi\'en se detienen.
 
 \paragraph{}
 Riesgos por dependencias de datos:
@@ -393,7 +455,8 @@ Se puede ver que el segmento de c\'odigo se ha ejecutado en 168 ciclos, uno m\'a
 
 \end{enumerate}
 
-\newpage
+\newpage 
+
 \section{Conclusi\'on}
 \paragraph{}
 Como conclusi\'on, podemos decir que el comando NOP, solo sirve para evitar riesgos pero no para acelerar el procesamiento del c\'odigo.
