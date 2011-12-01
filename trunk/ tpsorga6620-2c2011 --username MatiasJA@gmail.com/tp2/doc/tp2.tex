@@ -18,8 +18,11 @@
 %Para poner eprafe en las imagenes
 \usepackage[hang,bf]{caption2}
 
+
+\usepackage{anysize}
+
 %%------------Gráficos------------
-%%Paquete de gráficos
+%\%Paquete de gráficos
 %\newif\ifpdf
 %\ifx\pdfoutput\undefined
 %	\pdffalse
@@ -31,7 +34,7 @@
 %\ifpdf
 %	\usepackage[pdftex]{graphicx}
 %	\pdfcompresslevel=9
-%% 	\pdfcompresslevel=0
+%\% 	\pdfcompresslevel=0
 %	\usepackage{pdfpages}
 %\else
 %	\usepackage[dvips]{graphicx}
@@ -63,6 +66,8 @@
 
 
 \begin{document}
+
+\marginsize{2cm}{2cm}{2cm}{2cm}
 
 \begin{figure}
 \centering
@@ -125,13 +130,132 @@ Donde las variables A,B,C,D est\'an en memoria. La variable Z es de tipo double.
 \paragraph{}
 \underline{\textsc{Resoluci\'on:}}
 
+\paragraph{Ejecuci\'on del programa sin forwarding}
+
+
+\paragraph{}
+Se ejecutan X ciclos y X instrucciones , con 2 instrucciones en el  pipeline al finalizar.
+
+\paragraph{}
+\begin{center}
+$CPI = X  ciclos /x instrucciones = x$
+\end{center}
+
+\paragraph{}
+
+Se contaron un total de X stalls, divididos en las siguientes categor\'ias:
+
+\begin{itemize}
+\item x stalls de control (x\% de todos los ciclos)
+\item x  stalls correspondientes a la instruccion trap (x\% de todos los ciclos)
+\item x stalls RAW (Read After Write) (x\% de todos los ciclos).
+\end{itemize}
+
+\paragraph{Ejecuci\'on del programa con forwarding:}
+
+
+\paragraph{}
+Se ejecutan X ciclos y X instrucciones , con x instrucciones en el  pipeline al finalizar.
+
+\paragraph{}
+\begin{center}
+$CPI = x ciclos / x  instrucciones = x$
+\end{center}
+
+\paragraph{} 
+
+Se contaron un total de x stalls, divididos en las siguientes categor\'ias:
+
+\begin{itemize}
+\item x stalls de control (x\% de todos los ciclos)
+\item x stalls correspondientes a la instruccion trap (x\% de todos los ciclos)
+\item x stalls RAW (Read After Write) (x\% de todos los ciclos).
+\end{itemize}
+
+
 \newpage
 
 % PUNTO 2
 \item	Realizar un reordenamiento del c\'odigo assembly implementado en el \'item anterior que disminuya el CPI.
 
 \paragraph{}
-\textbf{Resoluci\'on:}
+\underline{\textsc{Resoluci\'on:}}
+
+Se reorden\'o el codigo moviendo a la instrucci\'on 
+
+\begin{verbatim}
+%andi r3,r2,#1 
+\end{verbatim}
+
+
+de la siguiente forma:
+
+\paragraph{}
+Codigo original:
+
+\begin{center}
+\begin{verbatim}
+	sge r8,r2,r5
+	bnez r8,Fin 
+	andi r3,r2,#1 
+	bnez r3,Modulo 
+	add r1,r1,r2
+\end{verbatim}
+\end{center}
+
+\paragraph{} 
+Codigo reordenado:
+
+\begin{center}
+\begin{verbatim}
+	sge r8,r2,r5 
+	andi r3,r2,#1 
+	bnez r8,Fin 	 
+	bnez r3,Modulo 
+	add r1,r1,r2
+\end{verbatim}
+\end{center}
+
+\paragraph{}
+Se obtuvieron los siguientes resultados:
+
+\paragraph{Ejecucion sin forwarding:}
+
+\paragraph{}
+Se ejecutan x ciclos y x instrucciones , con x instrucciones en el  pipeline al finalizar.
+
+\begin{center}
+$CPI = x ciclos / x instrucciones = x $
+\end{center}
+
+\paragraph{}
+
+Se contaron un total de x stalls, divididos en las siguientes categor\'ias:
+
+\begin{itemize}
+ \item x stalls de control (x\% de todos los ciclos)
+ \item  x  stalls correspondientes a la instruccion trap (x\% de todos los ciclos)
+ \item  x stalls RAW (Read After Write) (x\% de todos los ciclos)
+\end{itemize}
+
+\paragraph{Ejecuci\'on con forwarding:}
+
+\paragraph{}
+Se ejecutan x ciclos y x instrucciones , con x instrucciones en el  pipeline al finalizar.
+
+\begin{center}
+$CPI = x ciclos / x instrucciones = x$
+\end{center}
+
+
+\paragraph{} 
+Se contaron un total de x stalls, divididos en las siguientes categor\'ias:
+
+\begin{itemize}
+ \item x stalls de control (x\% de todos los ciclos)
+ \item x stalls correspondientes a la instruccion trap (x\% de todos los ciclos)
+ \item x  stalls RAW (Read After Write) (x\% de todos los ciclos)
+\end{itemize}
 
 
 \newpage
@@ -164,9 +288,9 @@ $CPI = 129 ciclos / 64 instrucciones = 2.02$
 Se contaron un total de 64 stalls, divididos en las siguientes categor\'ias:
 
 \begin{itemize}
-\item 10 stalls de control (7.75% de todos los ciclos)
-\item 2  stalls correspondientes a la instruccion trap (1.55% de todos los ciclos)
-\item 52 stalls RAW (Read After Write) (40.31% de todos los ciclos).
+\item 10 stalls de control (7.75\% de todos los ciclos)
+\item 2  stalls correspondientes a la instruccion trap (1.55\% de todos los ciclos)
+\item 52 stalls RAW (Read After Write) (40.31\% de todos los ciclos).
 \end{itemize}
 
 \paragraph{Ejecuci\'on del programa con forwarding:}
@@ -188,7 +312,7 @@ Se logr\'o un $SpeedUp = 1.32$
 Se contaron un total de 33 stalls, divididos en las siguientes categor\'ias:
 
 \begin{itemize}
-\item 10 stalls de control (10.20% de todos los ciclos)
+\item 10 stalls de control (10.20\% de todos los ciclos)
 \item 2  stalls correspondientes a la instruccion trap (2.04\% de todos los ciclos)
 \item 21 stalls RAW (Read After Write) (21.43\% de todos los ciclos), de los cuales los 21 corresponden a stalls de branch, es decir, que dichos branches tienen por argumentos registros escritos en la instruccion que los precede.
 \end{itemize}
@@ -211,7 +335,7 @@ Modulo:	sgt r8,r1,r6
 
 \paragraph{} 
 
-La instruccion andi se usa en el branch, por lo que no puede moverse al delay slot y sgt requiere de un registro que es modificado en caso de no tomar el branch, por lo que mover esta instruccion al delay slot modificar\'i�a la logica del programa.
+La instruccion andi se usa en el branch, por lo que no puede moverse al delay slot y sgt requiere de un registro que es modificado en caso de no tomar el branch, por lo que mover esta instruccion al delay slot modificar\'ia la logica del programa.
 
 \newpage
 
@@ -280,9 +404,9 @@ $CPI = 108 ciclos / 64 instrucciones = 1.69 $
 Se contaron un total de 43 stalls, divididos en las siguientes categor\'ias:
 
 \begin{itemize}
- \item 10 stalls de control (9.26% de todos los ciclos)
- \item  2  stalls correspondientes a la instruccion trap (1.85% de todos los ciclos)
- \item  31 stalls RAW (Read After Write) (28.70% de todos los ciclos)
+ \item 10 stalls de control (9.26\% de todos los ciclos)
+ \item  2  stalls correspondientes a la instruccion trap (1.85\% de todos los ciclos)
+ \item  31 stalls RAW (Read After Write) (28.70\% de todos los ciclos)
 \end{itemize}
 
 \paragraph{}
@@ -305,9 +429,9 @@ SpeedUp respecto al codigo$ sin reordenamiento = 1.17$
 Se contaron un total de 19 stalls, divididos en las siguientes categor\'ias:
 
 \begin{itemize}
- \item 10 stalls de control (11.09% de todos los ciclos)
- \item  stalls correspondientes a la instruccion trap (2.38% de todos los ciclos)
- \item stalls RAW (Read After Write) (8.33% de todos los ciclos), de los cuales los 7 corresponden a stalls de branch, es decir, que dichos branches tienen por argumentos registros escritos en la instruccion que los precede.
+ \item 10 stalls de control (11.09\% de todos los ciclos)
+ \item  stalls correspondientes a la instruccion trap (2.38\% de todos los ciclos)
+ \item stalls RAW (Read After Write) (8.33\% de todos los ciclos), de los cuales los 7 corresponden a stalls de branch, es decir, que dichos branches tienen por argumentos registros escritos en la instruccion que los precede.
 \end{itemize}
 
 \newpage
@@ -364,7 +488,7 @@ Finish:
 
 \paragraph{}
 \centering
-\includegraphics[width=470pt]{punto5-1.JPG}
+\includegraphics[width=400pt]{punto5-1.JPG}
 
 
 \paragraph{}
@@ -388,7 +512,7 @@ Finish:
 
 \paragraph{}
 \centering
-\includegraphics[width=470pt]{punto5-2.JPG}
+\includegraphics[width=400pt]{punto5-2.JPG}
 
 \paragraph{}
 Como se puede apreciar, no hay beneficio en cuanto a la cantidad de ciclos necesarios para ejecutar el programa.
@@ -418,7 +542,7 @@ loop: 	xor r2, r2, r2
 
 \paragraph{}
 \centering
-\includegraphics[width=470pt]{punto5-3.JPG}
+\includegraphics[width=400pt]{punto5-3.JPG}
 
 \paragraph{}
 \begin{center}
@@ -446,7 +570,7 @@ loop: 	xor r2, r2, r2
 
 \paragraph{}
 \centering
-\includegraphics[width=470pt]{punto5-4.JPG}
+\includegraphics[width=400pt]{punto5-4.JPG}
 
 \paragraph{}
 Se puede ver que el segmento de c\'odigo se ha ejecutado en 168 ciclos, uno m\'as que sin utilizar el comando NOP.
